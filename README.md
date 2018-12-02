@@ -14,7 +14,9 @@ Clone the github repository:
 The inventory file contains hostnames/ip addresses and ssh credentials in order to retreive data.
 The inventory file is in YAML format and will be created automatically if there is not one in the autosave directory.
 The file can be edited with a text editor to edit/add/delete sections.
-See example YAML file below:
+
+
+See example inventory.yml file below:
 
     cisco_ios:
     - host: 172.18.100.221
