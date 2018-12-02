@@ -12,7 +12,7 @@ Clone the github repository:
 
 All files are created in the autosave directory.
 
-Verify connectivity and SSH credentials to hosts defined in inventory file:
+Verify connectivity and credentials to hosts defined in inventory file:
 
     python3 autosave.py -c
 
