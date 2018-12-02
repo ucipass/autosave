@@ -35,6 +35,10 @@ def sshGetArp(device_type):
     global inventory
     global arp
     header = ['address', 'mac', 'host', 'interface', 'age', 'type']
+    try:
+        iterator = iter(inventory[device_type])
+    except Exception as e:
+        return False #no good yaml content found
     for device in inventory[device_type]:
         host_arp = []
         host=device['host']
@@ -69,6 +73,10 @@ def sshGetMac(device_type):
     global inventory
     global mac
     header = ['vlan','destination_address', 'destination_port', 'type', 'host']
+    try:
+        iterator = iter(inventory[device_type])
+    except Exception as e:
+        return False #no good yaml content found
     for device in inventory[device_type]:
         host_mac = []
         host=device['host']
@@ -102,6 +110,10 @@ def sshGetMac(device_type):
 def sshShowRun(device_type):
     global inventory
     global mac
+    try:
+        iterator = iter(inventory[device_type])
+    except Exception as e:
+        return False #no good yaml content found
     for device in inventory[device_type]:
         host=device['host']
         username=device['username']
