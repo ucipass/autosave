@@ -60,6 +60,7 @@ def sshGetArp(device_type):
         except Exception as e:
             print(e)
         arp = arp + host_arp
+    timestr = time.strftime("%Y%m%d-%H%M%S")
     filename = "ALL_ARP_" + timestr + ".csv"
     arp = sorted(arp, key=None, reverse=False)
     writeCSV(header,arp,filename)
@@ -209,9 +210,13 @@ if not args.verify and not args.mac and not args.arp and not args.config:
 readYAML()
 if args.verify:
     sshVerifyInventory("cisco_ios")
+    sshVerifyInventory("cisco_nxos")
 if args.config:
     sshShowRun("cisco_ios")
+    sshShowRun("cisco_nxos")
 if args.arp:
     sshGetArp("cisco_ios")
+    sshGetArp("cisco_nxos")
 if args.mac:
     sshGetMac("cisco_ios")
+    sshGetMac("cisco_nxos")
