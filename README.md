@@ -4,9 +4,13 @@ Automatically save configuration files, mac tables and arp tables of several rou
 
 ## Installation
 
-git clone https://github.com/ucipass/autosave
+Clone the github repository:
+
+    git clone https://github.com/ucipass/autosave
 
 ## Usage
+
+All files are created in the autosave directory.
 
 Verify connectivity and SSH credentials to hosts defined in inventory file:
 
