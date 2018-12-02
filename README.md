@@ -1,4 +1,4 @@
-# autosave
+# Autosave
 
 Automatically save configuration files, mac tables and arp tables of several routers and/or switched based on an inventory file
 
@@ -7,6 +7,17 @@ Automatically save configuration files, mac tables and arp tables of several rou
 Clone the github repository:
 
     git clone https://github.com/ucipass/autosave
+
+## Inventory file
+
+The inventory file contains hostnames/ip addresses and ssh credentials in order to retreive data.
+The inventory file is in YAML format and will be created automatically if there is not one in the autosave directory.
+The file can be edited with a text editor to edit/add/delete sections.
+See example YAML file below:
+
+    - Files
+        - 1
+        - 2
 
 ## Usage
 
@@ -34,10 +45,4 @@ To get help, just run
 
 ## Use cases
 
-### Inventory files
 
-The inventory files is created automatically if there is none in the same directory where the python file is located.
-The inventory files is in YAML format. See example file below:
-    - Files
-        - 1
-        - 2
