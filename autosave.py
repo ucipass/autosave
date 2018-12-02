@@ -5,13 +5,14 @@ import yaml
 import sys
 import csv
 import time
-import six, collections
+import os
 import argparse
 
 inventoryFile = "inventory.yml"
 inventory = { "cisco_ios" : [], 'cisco_nxos' : []}
 arp = []
 mac = []
+
 
 def sshVerify(host, username, password, device_type):
     try:
@@ -34,6 +35,10 @@ def sshVerifyInventory(device_type):
 def sshGetArp(device_type):
     global inventory
     global arp
+    dir = os.path.dirname(os.path.realpath(__file__))
+    dir = os.path.join(dir, 'arp')
+    if not os.path.exists(dir):
+        os.makedirs(dir)
     header = ['address', 'mac', 'host', 'interface', 'age', 'type']
     try:
         iterator = iter(inventory[device_type])
@@ -57,7 +62,7 @@ def sshGetArp(device_type):
                     host_arp.append(arpEntry)
                 host_arp = sorted(host_arp, key=None, reverse=False)
                 timestr = time.strftime("%Y%m%d-%H%M%S")
-                filename = hostname + "_ARP_" + timestr + ".csv"
+                filename = os.path.join(dir, hostname + "_ARP_" + timestr + ".csv" )
                 writeCSV(header, host_arp, filename)
             else:
                 print("Failed:\n", cmd_output)
@@ -65,13 +70,17 @@ def sshGetArp(device_type):
             print(e)
         arp = arp + host_arp
     timestr = time.strftime("%Y%m%d-%H%M%S")
-    filename = "ALL_ARP_" + timestr + ".csv"
+    filename = os.path.join(dir, "ALL_ARP_" + timestr + ".csv")
     arp = sorted(arp, key=None, reverse=False)
     writeCSV(header,arp,filename)
 
 def sshGetMac(device_type):
     global inventory
     global mac
+    dir = os.path.dirname(os.path.realpath(__file__))
+    dir = os.path.join(dir, 'mac')
+    if not os.path.exists(dir):
+        os.makedirs(dir)
     header = ['vlan','destination_address', 'destination_port', 'type', 'host']
     try:
         iterator = iter(inventory[device_type])
@@ -95,7 +104,7 @@ def sshGetMac(device_type):
                     host_mac.append(macEntry)
                 host_mac = sorted(host_mac, key=None, reverse=False)
                 timestr = time.strftime("%Y%m%d-%H%M%S")
-                filename = hostname + "_MAC_" + timestr + ".csv"
+                filename = os.path.join(dir, hostname + "_MAC_" + timestr + ".csv")
                 writeCSV(header, host_mac, filename)
             else:
                 print("  Failed to retrieve MAC table for: ", host)
@@ -104,12 +113,16 @@ def sshGetMac(device_type):
         mac = mac + host_mac
     mac = sorted(mac, key=None, reverse=False)
     timestr = time.strftime("%Y%m%d-%H%M%S")
-    filename = "ALL_MAC_" + timestr + ".csv"
+    filename = os.path.join(dir, "ALL_MAC_" + timestr + ".csv")
     writeCSV(header,mac,filename)
 
 def sshShowRun(device_type):
     global inventory
     global mac
+    dir = os.path.dirname(os.path.realpath(__file__))
+    dir = os.path.join(dir, 'config')
+    if not os.path.exists(dir):
+        os.makedirs(dir)
     try:
         iterator = iter(inventory[device_type])
     except Exception as e:
@@ -125,7 +138,7 @@ def sshShowRun(device_type):
             hostname = re.sub('\W+','', hostname )
             cmd_output = net_connect.send_command("show run", use_textfsm=True)
             timestr = time.strftime("%Y%m%d-%H%M%S")
-            filename = hostname + "_CONFIG_" + timestr + ".txt"
+            filename = os.path.join(dir, hostname + "_CONFIG_" + timestr + ".txt")
             if 'hostname' in cmd_output:
                 text_file = open(filename, "w")
                 text_file.write(cmd_output)
