@@ -4,6 +4,7 @@ Automatically save configuration files, mac tables and arp tables of several rou
 
 ## Installation
 
+Make sure python 3 is installed on your system.
 Clone the github repository:
 
     git clone https://github.com/ucipass/autosave
