@@ -13,19 +13,6 @@ inventory = { "cisco_ios" : [], 'cisco_nxos' : []}
 arp = []
 mac = []
 
-def sshconnect():
-    # password = getpass()
-    net_connect = Netmiko(host='172.18.100.2', username='admin', password="cisco", device_type='cisco_ios')
-    net_connect.find_prompt()
-    # out = net_connect.send_command_timing("copy running-config tftp:")
-    # out = net_connect.send_command("show version", use_textfsm=True)
-    cmd_output = net_connect.send_command("ping 172.18.100.1", use_textfsm=True)
-    ping_result = re.search('[\.\!]{2,5}', cmd_output)
-    if ping_result:
-        print(ping_result.group())
-    else:
-        print("Failed:\n", cmd_output)
-
 def sshVerify(host, username, password, device_type):
     try:
         net_connect = Netmiko(host=host, username=username, password=password, device_type=device_type, timeout=2)
