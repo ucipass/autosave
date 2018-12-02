@@ -6,7 +6,7 @@ Automatically save configuration files, mac tables and arp tables of several rou
 
 Clone the github repository:
 
-    git clone https://github.com/ucipass/autosave 
+    git clone https://github.com/ucipass/autosave
 
 ## Inventory file
 
@@ -15,9 +15,20 @@ The inventory file is in YAML format and will be created automatically if there 
 The file can be edited with a text editor to edit/add/delete sections.
 See example YAML file below:
 
-    - Files
-        - 1
-        - 2
+    cisco_ios:
+    - host: 172.18.100.221
+      password: cisco
+      username: admin
+    - host: 172.18.100.222
+      password: cisco
+      username: admin
+    cisco_nxos:
+    - host: 172.18.100.223
+      password: cisco
+      username: admin
+    - host: 172.18.100.224
+      password: cisco
+      username: admin
 
 ## Usage
 
@@ -42,7 +53,4 @@ Save MAC table:
 To get help, just run
 
     python3 autosave.py --help
-
-## Use cases
-
 
