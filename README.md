@@ -41,15 +41,15 @@ Verify connectivity and credentials to hosts defined in inventory file:
 
     python3 autosave.py -c
 
-Save confugration file:
+Save confugration files:
 
     python3 autosave.py -c
 
-Save ARP table:
+Save ARP tables:
 
     python3 autosave.py -a
 
-Save MAC table:
+Save MAC tables:
 
     python3 autosave.py -m
 
@@ -57,3 +57,7 @@ To get help, just run
 
     python3 autosave.py --help
 
+## Results
+
+Files are saved in subdirectories (config,mac,arp)
+There is a consolidated _ALL_ files with sorted mac and arp entries from all files.
