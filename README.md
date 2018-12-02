@@ -16,7 +16,7 @@ The inventory file is in YAML format and will be created automatically if there 
 The file can be edited with a text editor to edit/add/delete sections.
 
 
-See example inventory.yml file below:
+See sample inventory.yml file below:
 
     cisco_ios:
     - host: 172.18.100.221
