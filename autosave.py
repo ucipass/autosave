@@ -8,15 +8,19 @@ import time
 import os
 import argparse
 
+dir_root = os.path.dirname(os.path.realpath(__file__))
+dir_fsm = os.path.join(dir_root, 'templates')
+os.environ['NET_TEXTFSM'] = dir_fsm
 inventoryFile = "inventory.yml"
 inventory = { "cisco_ios" : [], 'cisco_nxos' : []}
 arp = []
 mac = []
 
 
+
 def sshVerify(host, username, password, device_type):
     try:
-        net_connect = Netmiko(host=host, username=username, password=password, device_type=device_type, timeout=2)
+        net_connect = Netmiko(host=host, username=username, password=password, device_type=device_type, timeout=5)
         net_connect.find_prompt()
         return True
     except Exception as e:
@@ -51,9 +55,10 @@ def sshGetArp(device_type):
         password=device['password']
         try:
             print("Retrieving ARP table for:", host)
-            net_connect = Netmiko(host=host, username=username, password=password, device_type=device_type, timeout=2)
+            net_connect = Netmiko(host=host, username=username, password=password, device_type=device_type, timeout=10)
             hostname = net_connect.find_prompt()
-            hostname = re.sub('\W+','', hostname )
+            hostname = re.sub('\W+','', hostname)
+            cmd_output = net_connect.send_command("term len 0", use_textfsm=False)
             cmd_output = net_connect.send_command("show ip arp", use_textfsm=True)
             if not "ailed" in cmd_output:
                 print(" ",cmd_output)
@@ -93,9 +98,10 @@ def sshGetMac(device_type):
         password=device['password']
         try:
             print("Retrieving MAC table for:", host)
-            net_connect = Netmiko(host=host, username=username, password=password, device_type=device_type, timeout=2)
+            net_connect = Netmiko(host=host, username=username, password=password, device_type=device_type, timeout=10)
             hostname = net_connect.find_prompt()
-            hostname = re.sub('\W+','', hostname )
+            hostname = re.sub('#','', hostname )
+            cmd_output = net_connect.send_command("term len 0", use_textfsm=False)
             cmd_output = net_connect.send_command("show mac address-table", use_textfsm=True)
             if not 'nvalid' in cmd_output:
                 print(" ",cmd_output)
@@ -133,10 +139,11 @@ def sshShowRun(device_type):
         password=device['password']
         try:
             print("Saving configration file for:", host)
-            net_connect = Netmiko(host=host, username=username, password=password, device_type=device_type, timeout=2)
+            net_connect = Netmiko(host=host, username=username, password=password, device_type=device_type, timeout=10)
             hostname = net_connect.find_prompt()
-            hostname = re.sub('\W+','', hostname )
-            cmd_output = net_connect.send_command("show run", use_textfsm=True)
+            hostname = re.sub('#','', hostname)
+            cmd_output = net_connect.send_command("term len 0", use_textfsm=False)
+            cmd_output = net_connect.send_command("show run", use_textfsm=False)
             timestr = time.strftime("%Y%m%d-%H%M%S")
             filename = os.path.join(dir, hostname + "_CONFIG_" + timestr + ".txt")
             if 'hostname' in cmd_output:
