@@ -4,15 +4,19 @@ Automatically save configuration files, mac tables and arp tables of several rou
 
 ## Installation
 
-Make sure python 3 is installed on your system.
-Clone the github repository:
+No installation is necessary as there is a single autosave.exe 64 bit windows executable in the .\dist directory.
+autosave.exe was create with pyinstallte and is equivallent to "python3.exe autosave.py"
+If you want to run this with a python interpreter, make sure python3 is installed on your system.
+Clone the github repository and install netmiko and textfsm:
 
     git clone https://github.com/ucipass/autosave
+    pip3 install netmiko
+    pip3 install textfsm
 
 ## Inventory file
 
 The inventory file contains hostnames/ip addresses and ssh credentials in order to retreive data.
-The inventory file is in YAML format and will be created automatically if there is not one in the autosave directory.
+The inventory file (default: inventory.yml) is in YAML format and will be created automatically if there is not one in the autosave directory.
 The file can be edited with a text editor to edit/add/delete sections.
 
 
@@ -35,23 +39,40 @@ See sample inventory.yml file below:
 
 ## Usage
 
-All files are created in the autosave directory.
+All files are created in the same autosave directory.
 
-Verify connectivity and credentials to hosts defined in inventory file:
+    autosave.exe [-h] [-c] [-m] [-a] [-v] [-f [FILENAME]]
+    
+    optional arguments:
+      -h, --help            show this help message and exit
+      -c, --config          retrieve configuration files
+      -m, --mac             retrieve MAC tables
+      -a, --arp             retrieve ARP tables
+      -v, --verify          verify hosts are accessible
+      -f [FILENAME], --filename [FILENAME]
+                            inventory file in YAML format
+
+## Examples
+
+Verify connectivity and credentials for hosts defined in the default inventory.yml file:
 
     python3 autosave.py -c
 
-Save confugration files:
+Save confugration files for hosts defined in the default inventory.yml file:
 
     python3 autosave.py -c
 
-Save ARP tables:
+Save ARP tables for hosts defined in the default inventory.yml file:
 
     python3 autosave.py -a
 
-Save MAC tables:
+Save MAC tablesfor hosts defined in the default inventory.yml file:
 
     python3 autosave.py -m
+
+Save configuration files, MAC Tables, ARP tables for hosts defined in an alternative inventory2.yml file:
+
+    python3 autosave.py -c -a -m -f inventory2.yml
 
 To get help, just run
 
