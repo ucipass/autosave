@@ -1,6 +1,6 @@
 # Autosave
 
-Automatically save configuration files, mac tables and arp tables of several routers and/or switched based on an inventory file
+Automatically save configuration files, mac tables and arp tables of several routers and/or switches based on an inventory file
 
 ## Installation
 
