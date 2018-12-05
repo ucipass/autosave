@@ -22,8 +22,8 @@ Make sure python3 is installed on your system, clone the github repository and i
     You have no inventory file: inventory.yml!
     Would you like to create it? y/n (Default: no):
     y
-    What would you like to add to inventory?
-    (i)os/n(x)os/(n)othing (Default: (n)othing)
+    What would you like to add a device to inventory?
+    (i)os/n(x)os/(n)o (Default: (n)othing/continue)
     i
     Enter hostname or IP address:
     10.255.254.1
@@ -32,8 +32,9 @@ Make sure python3 is installed on your system, clone the github repository and i
     Enter password:
     Password:
     Verifying credentials....
-    What would you like to add to inventory?
-    (i)os/n(x)os/(n)othing (Default: (n)othing)
+    Verification successful!
+    What would you like to add a device to inventory?
+    (i)os/n(x)os/(n)o (Default: (n)othing/continue)
     n
     Press (c) to retreive configuration files!
     Press (a) to retreive ARP tables!
@@ -42,8 +43,7 @@ Make sure python3 is installed on your system, clone the github repository and i
     Press (e) to exite!
     c
     Saving configration file for: 10.255.254.1
-      Saved Configuration files as: C:\autosave\config\VoiceLab-Switch_CONFIG_20181205-125301.txt
-    
+      Saved Configuration files as: C:\autosave\config\VoiceLab-Switch_CONFIG_20181205-162427.txt
     C:\autosave>
 
 ## Inventory file

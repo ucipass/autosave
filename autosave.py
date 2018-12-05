@@ -321,7 +321,7 @@ def main():
         print("Press (c) to retreive configuration files!")
         print("Press (a) to retreive ARP tables!")
         print("Press (m) to retreive MAC tables!")
-        print("Press (v) to to verify inventory reachability!")
+        print("Press (v) to verify inventory reachability!")
         print("Press (e) to exite!")
         answer = input()
     if args.verify or answer == "v":
