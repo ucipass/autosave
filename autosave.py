@@ -13,8 +13,11 @@ import io
 dir_root = os.path.dirname(os.path.realpath(__file__))
 dir_fsm = os.path.join(dir_root, 'templates')
 inventoryFile = "inventory.yml"
-inventory = { "cisco_ios" : [], 'cisco_nxos' : []}
+inventory = {"cisco_ios": [], 'cisco_nxos': []}
 
+################################################################
+#  TEXTFSM TEMPLATE VARIABLES
+################################################################
 cisco_ios_show_mac_address_table = """Value DESTINATION_ADDRESS (\w+.\w+.\w+)
 Value TYPE (\w+)
 Value VLAN (\w+)
@@ -85,7 +88,8 @@ fsm = {
     }
 }
 
-def sshVerify(host, username, password, device_type):
+
+def ssh_verify(host, username, password, device_type):
     try:
         net_connect = Netmiko(host=host, username=username, password=password, device_type=device_type, timeout=5)
         net_connect.find_prompt()
@@ -94,25 +98,25 @@ def sshVerify(host, username, password, device_type):
         print(e)
         return None
 
-def sshVerifyInventory(device_type):
+
+def ssh_verify_inventory(device_type):
     global inventory
     for device in inventory[device_type]:
-        host=device['host']
-        username=device['username']
-        password=device['password']
-        result = sshVerify(host, username, password, device_type)
-        print(host,"accessible:",result)
+        host = device['host']
+        username = device['username']
+        password = device['password']
+        result = ssh_verify(host, username, password, device_type)
+        print(host, "accessible:", result)
 
-def sshGetArp(device_type):
+
+def ssh_get_arp(device_type):
     global inventory
     table_all = []
-    dir = os.path.dirname(os.path.realpath(__file__))
-    dir = os.path.join(dir, 'arp')
-    if not os.path.exists(dir):
-        os.makedirs(dir)
-    #fsm_file = os.path.join(dir_fsm, device_type+"_show_ip_arp.template")
-    #re_table = textfsm.TextFSM(open(fsm_file, 'r'))
-
+    homedir = os.path.dirname(os.path.realpath(__file__))
+    homedir = os.path.join(homedir, 'arp')
+    re_table = textfsm.TextFSM(io.StringIO(fsm[device_type]['arp']))
+    if not os.path.exists(homedir):
+        os.makedirs(homedir)
     for device in inventory[device_type]:
         table = []
         host = device['host']
@@ -122,39 +126,36 @@ def sshGetArp(device_type):
             print("Retrieving ARP table for:", host)
             net_connect = Netmiko(host=host, username=username, password=password, device_type=device_type, timeout=10)
             hostname = net_connect.find_prompt()
-            hostname = re.sub('#','', hostname)
+            hostname = re.sub('#', '', hostname)
             net_connect.send_command("term len 0", use_textfsm=False)
             cmd_output = net_connect.send_command("show ip arp", use_textfsm=False)
-            re_table = textfsm.TextFSM(io.StringIO(fsm[device_type]['arp']))
             cmd_output = re_table.ParseText(cmd_output)
 
-            if not "ailed" in cmd_output:
+            if "ailed" not in cmd_output:
                 print(" Success!: ", cmd_output[0], "more...")
                 for arpEntry in cmd_output:
                     table.append(arpEntry)
                 table = sorted(table, key=None, reverse=False)
-                filename = os.path.join(dir, hostname + "_arp_" + time.strftime("%Y%m%d-%H%M%S") + ".csv")
-                writeCSV(re_table.header, table, filename)
+                filename = os.path.join(homedir, hostname + "_arp_" + time.strftime("%Y%m%d-%H%M%S") + ".csv")
+                write_csv(re_table.header, table, filename)
             else:
                 print(" Failed!:\n", cmd_output)
         except Exception as e:
             print(e)
         table_all = table_all + table
-    filename = os.path.join(dir, "all_arp_" + time.strftime("%Y%m%d-%H%M%S") + ".csv")
+    filename = os.path.join(homedir, "all_arp_" + time.strftime("%Y%m%d-%H%M%S") + ".csv")
     table_all = sorted(table_all, key=None, reverse=False)
-    writeCSV(re_table.header, table_all, filename)
+    write_csv(re_table.header, table_all, filename)
 
 
-def sshGetMac(device_type):
+def ssh_get_mac(device_type):
     global inventory
     table_all = []
-    dir = os.path.dirname(os.path.realpath(__file__))
-    dir = os.path.join(dir, 'mac')
-    if not os.path.exists(dir):
-        os.makedirs(dir)
-    #fsm_file = os.path.join(dir_fsm, device_type+"_show_ip_arp.template")
-    #re_table = textfsm.TextFSM(open(fsm_file, 'r'))
-
+    homedir = os.path.dirname(os.path.realpath(__file__))
+    homedir = os.path.join(homedir, 'mac')
+    re_table = textfsm.TextFSM(io.StringIO(fsm[device_type]['mac']))
+    if not os.path.exists(homedir):
+        os.makedirs(homedir)
     for device in inventory[device_type]:
         table = []
         host = device['host']
@@ -164,64 +165,64 @@ def sshGetMac(device_type):
             print("Retrieving MAC table for:", host)
             net_connect = Netmiko(host=host, username=username, password=password, device_type=device_type, timeout=10)
             hostname = net_connect.find_prompt()
-            hostname = re.sub('#','', hostname)
+            hostname = re.sub('#', '', hostname)
             net_connect.send_command("term len 0", use_textfsm=False)
             cmd_output = net_connect.send_command("show mac address-table", use_textfsm=False)
-            re_table = textfsm.TextFSM(io.StringIO(fsm[device_type]['mac']))
             cmd_output = re_table.ParseText(cmd_output)
 
-            if not "ailed" in cmd_output:
+            if "ailed" not in cmd_output:
                 print(" Success!: ", cmd_output[0], "more...")
                 for arpEntry in cmd_output:
                     table.append(arpEntry)
                 table = sorted(table, key=None, reverse=False)
-                filename = os.path.join(dir, hostname + "_mac_" + time.strftime("%Y%m%d-%H%M%S") + ".csv")
-                writeCSV(re_table.header, table, filename)
+                filename = os.path.join(homedir, hostname + "_mac_" + time.strftime("%Y%m%d-%H%M%S") + ".csv")
+                write_csv(re_table.header, table, filename)
             else:
                 print(" Failed!:\n", cmd_output)
         except Exception as e:
             print(e)
         table_all = table_all + table
-    filename = os.path.join(dir, "all_mac_" + time.strftime("%Y%m%d-%H%M%S") + ".csv")
+    filename = os.path.join(homedir, "all_mac_" + time.strftime("%Y%m%d-%H%M%S") + ".csv")
     table_all = sorted(table_all, key=None, reverse=False)
-    writeCSV(re_table.header, table_all, filename)
+    write_csv(re_table.header, table_all, filename)
 
-def sshShowRun(device_type):
+
+def ssh_show_run(device_type):
     global inventory
-    global mac
-    dir = os.path.dirname(os.path.realpath(__file__))
-    dir = os.path.join(dir, 'config')
-    if not os.path.exists(dir):
-        os.makedirs(dir)
+    homedir = os.path.dirname(os.path.realpath(__file__))
+    homedir = os.path.join(homedir, 'config')
+    if not os.path.exists(homedir):
+        os.makedirs(homedir)
     try:
-        iterator = iter(inventory[device_type])
+        iter(inventory[device_type])
     except Exception as e:
-        return False #no good yaml content found
+        return False  # no good yaml content found
     for device in inventory[device_type]:
-        host=device['host']
-        username=device['username']
-        password=device['password']
+        host = device['host']
+        username = device['username']
+        password = device['password']
         try:
             print("Saving configration file for:", host)
             net_connect = Netmiko(host=host, username=username, password=password, device_type=device_type, timeout=10)
             hostname = net_connect.find_prompt()
-            hostname = re.sub('#','', hostname)
-            cmd_output = net_connect.send_command("term len 0", use_textfsm=False)
+            hostname = re.sub('#', '', hostname)
+            net_connect.send_command("term len 0", use_textfsm=False)
             cmd_output = net_connect.send_command("show run", use_textfsm=False)
             timestr = time.strftime("%Y%m%d-%H%M%S")
-            filename = os.path.join(dir, hostname + "_CONFIG_" + timestr + ".txt")
+            filename = os.path.join(homedir, hostname + "_CONFIG_" + timestr + ".txt")
             if 'hostname' in cmd_output:
                 text_file = open(filename, "w")
                 text_file.write(cmd_output)
                 text_file.close()
-                print("  Saved Configuration files as:",filename)
+                print("  Saved Configuration files as:", filename)
             else:
                 print("  Configration file was NOT saved for:", host)
         except Exception as e:
             print("  Configration file was NOT saved for:", host)
             print(e)
 
-def writeCSV(header,data,filename):
+
+def write_csv(header, data, filename):
     # sample data [[1,2],[3,4],[5,6]]
     kwargs = {'newline': ''}
     mode = 'w'
@@ -235,84 +236,106 @@ def writeCSV(header,data,filename):
         writer.writerows(data)
 
 
-def writeYAML(data):
-    with open(inventoryFile, 'w') as outfile:
-        yaml.dump(data, outfile, default_flow_style=False)
-
-def readYAML():
-    global inventory
-    try:
-        with open(inventoryFile, 'r') as stream:
-            inventory = yaml.load(stream)
-            pass
-    except yaml.YAMLError as exc:
-        print("YAML Parsing Error, please fix or delete inventory file:", inventoryFile)
-        print(exc)
-    except FileNotFoundError as exc:
-        print("You have no inventory file: "+inventoryFile+"!")
-        print("Would you like to add one? y/n (Default: no):")
-        answer = input()
-        if answer == 'y':
-            addEntries()
-        else:
-            print('Exiting due to missing inventory file.')
-            sys.exc_info()[0]
-    except:
-        print("Unexpected error:")
-        print(sys.exc_info()[0])
-        raise
-
-def addEntry(device_type):
-    print ("Enter hostname or IP address:",)
+def add_entry(device_type):
+    print("Enter hostname or IP address:",)
     host = input()
-    print ("Enter username address:",)
+    print("Enter username address:",)
     username = input()
-    print ("Enter password:",)
+    print("Enter password:")
     password = getpass('Password:')
-    entry = sshVerify(host, username, password, device_type)
+    print("Verifying crednetials....")
+    entry = ssh_verify(host, username, password, device_type)
     if entry:
-        inventory[device_type].append({'host': host, 'username' : username, 'password' : password})
-        writeYAML(inventory)
+        inventory[device_type].append({'host': host, 'username': username, 'password': password})
+        write_yaml(inventory)
 
-def addEntries():
+
+def add_entries():
     answer = ''
     while answer != 'n':
-        print ("What would you like to add to inventory?")
-        print ("(i)os/n(x)os/(n)othing (Default: (n)othing)")
+        print("What would you like to add to inventory?")
+        print("(i)os/n(x)os/(n)othing (Default: (n)othing)")
         answer = input()
-        entry = None
         if answer == "i":
-            addEntry("cisco_ios")
+            add_entry("cisco_ios")
         elif answer == "x":
-            addEntry("cisco_nxos")
+            add_entry("cisco_nxos")
         else:
             answer = "n"
 
+
+def write_yaml(data):
+    global inventoryFile
+    with open(inventoryFile, 'w') as outfile:
+        yaml.dump(data, outfile, default_flow_style=False)
+
+
+def read_yaml():
+    global inventory
+    global inventoryFile
+    try:
+        with open(inventoryFile, 'r') as stream:
+            inventory = yaml.load(stream)
+            if not inventory:
+                raise yaml.YAMLError
+            return True
+    except yaml.YAMLError as exc:
+        print("YAML Parsing Error, please fix or delete inventory file:", inventoryFile)
+        sys.exit(1)
+    except FileNotFoundError:
+        print("You have no inventory file: "+inventoryFile+"!")
+        print("Would you like to create it? y/n (Default: no):")
+        answer = input()
+        if answer == 'y':
+            add_entries()
+            read_yaml()
+        else:
+            print('Exiting due to missing inventory file.')
+            sys.exit(0)
+    except Exception as e:
+        print("Unexpected error:", e)
+        sys.exit(1)
+
+
 #
-#  MAIN PROGRAM FLOW
+#  MAIN PROGRAM
 #
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument("-c", "--config", help="retrieve configuration files", action="store_true" )
-parser.add_argument("-m", "--mac", help="retrieve MAC tables", action="store_true")
-parser.add_argument("-a", "--arp", help="retrieve ARP tables", action="store_true")
-parser.add_argument("-v", "--verify", help="verify hosts are accessible", action="store_true")
-args = parser.parse_args()
+def main():
+    global inventoryFile
+    global inventory
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-c", "--config", help="retrieve configuration files", action="store_true")
+    parser.add_argument("-m", "--mac", help="retrieve MAC tables", action="store_true")
+    parser.add_argument("-a", "--arp", help="retrieve ARP tables", action="store_true")
+    parser.add_argument("-v", "--verify", help="verify hosts are accessible", action="store_true")
+    parser.add_argument('-f', '--filename', help='inventory file in YAML format', nargs='?', default=inventoryFile)
+    args = parser.parse_args()
+    inventoryFile = args.filename
+    read_yaml()
 
-if not args.verify and not args.mac and not args.arp and not args.config:
-    parser.print_help()
-    sys.exc_info()[0]
-readYAML()
-if args.verify:
-    sshVerifyInventory("cisco_ios")
-    sshVerifyInventory("cisco_nxos")
-if args.config:
-    sshShowRun("cisco_ios")
-    sshShowRun("cisco_nxos")
-if args.arp:
-    sshGetArp("cisco_ios")
-    sshGetArp("cisco_nxos")
-if args.mac:
-    sshGetMac("cisco_ios")
-    sshGetMac("cisco_nxos")
+    if not args.verify and not args.mac and not args.arp and not args.config:
+        #parser.print_help()
+        print("Press (c) to retreive configuration files!")
+        print("Press (a) to retreive ARP tables!")
+        print("Press (m) to retreive MAC tables!")
+        print("Press (v) to to verify inventory reachability!")
+        print("Press (e) to exite!")
+        answer = input()
+    if args.verify or answer == "v":
+        ssh_verify_inventory("cisco_ios")
+        ssh_verify_inventory("cisco_nxos")
+    if args.config or answer == "c":
+        ssh_show_run("cisco_ios")
+        ssh_show_run("cisco_nxos")
+    if args.arp or answer == "a":
+        ssh_get_arp("cisco_ios")
+        ssh_get_arp("cisco_nxos")
+    if args.mac or answer == "m":
+        ssh_get_mac("cisco_ios")
+        ssh_get_mac("cisco_nxos")
+
+
+if __name__ == '__main__':
+    main()
