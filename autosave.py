@@ -93,6 +93,7 @@ def ssh_verify(host, username, password, device_type):
     try:
         net_connect = Netmiko(host=host, username=username, password=password, device_type=device_type, timeout=5)
         net_connect.find_prompt()
+        print("Verification successful!")
         return True
     except Exception as e:
         print(e)
@@ -253,8 +254,8 @@ def add_entry(device_type):
 def add_entries():
     answer = ''
     while answer != 'n':
-        print("What would you like to add to inventory?")
-        print("(i)os/n(x)os/(n)othing (Default: (n)othing)")
+        print("What would you like to add a device to inventory?")
+        print("(i)os/n(x)os/(n)o (Default: (n)othing/continue)")
         answer = input()
         if answer == "i":
             add_entry("cisco_ios")
