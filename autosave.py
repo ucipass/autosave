@@ -243,7 +243,7 @@ def add_entry(device_type):
     username = input()
     print("Enter password:")
     password = getpass('Password:')
-    print("Verifying crednetials....")
+    print("Verifying credentials....")
     entry = ssh_verify(host, username, password, device_type)
     if entry:
         inventory[device_type].append({'host': host, 'username': username, 'password': password})

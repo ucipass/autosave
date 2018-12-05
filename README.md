@@ -4,14 +4,47 @@ Automatically save configuration files, mac tables and arp tables of several rou
 
 ## Installation
 
-No installation is necessary as there is a single autosave.exe 64 bit windows executable in the .\dist directory.
-autosave.exe was create with pyinstallte and is equivallent to "python3.exe autosave.py"
-If you want to run this with a python interpreter, make sure python3 is installed on your system.
-Clone the github repository and install netmiko and textfsm:
+No installation is necessary as there is a single 64 bit windows executable in the dist directory.
+
+    autosave.exe
+
+Alternatively you can use python3 interpreter to run the program.
+Make sure python3 is installed on your system, clone the github repository and install netmiko and textfsm:
 
     git clone https://github.com/ucipass/autosave
     pip3 install netmiko
     pip3 install textfsm
+    python3.exe autosave.py
+
+## Quick Start Example
+
+    C:\autosave>autosave.exe
+    You have no inventory file: inventory.yml!
+    Would you like to create it? y/n (Default: no):
+    y
+    What would you like to add to inventory?
+    (i)os/n(x)os/(n)othing (Default: (n)othing)
+    i
+    Enter hostname or IP address:
+    10.255.254.1
+    Enter username address:
+    admin
+    Enter password:
+    Password:
+    Verifying credentials....
+    What would you like to add to inventory?
+    (i)os/n(x)os/(n)othing (Default: (n)othing)
+    n
+    Press (c) to retreive configuration files!
+    Press (a) to retreive ARP tables!
+    Press (m) to retreive MAC tables!
+    Press (v) to to verify inventory reachability!
+    Press (e) to exite!
+    c
+    Saving configration file for: 10.255.254.1
+      Saved Configuration files as: C:\autosave\config\VoiceLab-Switch_CONFIG_20181205-125301.txt
+    
+    C:\autosave>
 
 ## Inventory file
 
