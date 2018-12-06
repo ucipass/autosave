@@ -312,6 +312,7 @@ def main():
     parser.add_argument("-a", "--arp", help="retrieve ARP tables", action="store_true")
     parser.add_argument("-v", "--verify", help="verify hosts are accessible", action="store_true")
     parser.add_argument('-f', '--filename', help='inventory file in YAML format', nargs='?', default=inventoryFile)
+    answer = ""
     args = parser.parse_args()
     inventoryFile = args.filename
     read_yaml()
