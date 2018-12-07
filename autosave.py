@@ -14,6 +14,8 @@ dir_root = os.path.dirname(os.path.realpath(__file__))
 dir_fsm = os.path.join(dir_root, 'templates')
 inventoryFile = "inventory.yml"
 inventory = {"cisco_ios": [], 'cisco_nxos': []}
+mac_table_all = []
+arp_table_all = []
 
 ################################################################
 #  TEXTFSM TEMPLATE VARIABLES
@@ -112,10 +114,10 @@ def ssh_verify_inventory(device_type):
 
 def ssh_get_arp(device_type):
     global inventory
-    table_all = []
+    global arp_table_all
+    table_header = ['ADDRESS', 'AGE', 'MAC', 'TYPE', 'INTERFACE', 'HOSTNAME']
     homedir = os.path.dirname(os.path.realpath(__file__))
     homedir = os.path.join(homedir, 'arp')
-    re_table = textfsm.TextFSM(io.StringIO(fsm[device_type]['arp']))
     if not os.path.exists(homedir):
         os.makedirs(homedir)
     for device in inventory[device_type]:
@@ -130,31 +132,34 @@ def ssh_get_arp(device_type):
             hostname = re.sub('#', '', hostname)
             net_connect.send_command("term len 0", use_textfsm=False)
             cmd_output = net_connect.send_command("show ip arp", use_textfsm=False)
+            re_table = textfsm.TextFSM(io.StringIO(fsm[device_type]['arp']))
             cmd_output = re_table.ParseText(cmd_output)
 
             if "ailed" not in cmd_output:
                 print(" Success!: ", cmd_output[0], "more...")
-                for arpEntry in cmd_output:
-                    table.append(arpEntry)
+                for arp_entry in cmd_output:
+                    arp_entry.append(hostname)
+                    table.append(arp_entry)
                 table = sorted(table, key=None, reverse=False)
                 filename = os.path.join(homedir, hostname + "_arp_" + time.strftime("%Y%m%d-%H%M%S") + ".csv")
-                write_csv(re_table.header, table, filename)
+                write_csv(table_header, table, filename)
             else:
                 print(" Failed!:\n", cmd_output)
         except Exception as e:
             print(e)
-        table_all = table_all + table
+        arp_table_all = arp_table_all + table
     filename = os.path.join(homedir, "all_arp_" + time.strftime("%Y%m%d-%H%M%S") + ".csv")
-    table_all = sorted(table_all, key=None, reverse=False)
-    write_csv(re_table.header, table_all, filename)
+    arp_table_all = sorted(arp_table_all, key=None, reverse=False)
+    write_csv(table_header, arp_table_all, filename)
+    pass
 
 
 def ssh_get_mac(device_type):
     global inventory
-    table_all = []
+    global mac_table_all
+    table_header = ['DESTINATION_ADDRESS', 'TYPE', 'VLAN', 'DESTINATION_PORT', 'HOSTNAME']
     homedir = os.path.dirname(os.path.realpath(__file__))
     homedir = os.path.join(homedir, 'mac')
-    re_table = textfsm.TextFSM(io.StringIO(fsm[device_type]['mac']))
     if not os.path.exists(homedir):
         os.makedirs(homedir)
     for device in inventory[device_type]:
@@ -169,23 +174,25 @@ def ssh_get_mac(device_type):
             hostname = re.sub('#', '', hostname)
             net_connect.send_command("term len 0", use_textfsm=False)
             cmd_output = net_connect.send_command("show mac address-table", use_textfsm=False)
+            re_table = textfsm.TextFSM(io.StringIO(fsm[device_type]['mac']))
             cmd_output = re_table.ParseText(cmd_output)
 
             if "ailed" not in cmd_output:
                 print(" Success!: ", cmd_output[0], "more...")
-                for arpEntry in cmd_output:
-                    table.append(arpEntry)
+                for mac_entry in cmd_output:
+                    mac_entry.append(hostname)
+                    table.append(mac_entry)
                 table = sorted(table, key=None, reverse=False)
                 filename = os.path.join(homedir, hostname + "_mac_" + time.strftime("%Y%m%d-%H%M%S") + ".csv")
-                write_csv(re_table.header, table, filename)
+                write_csv(table_header, table, filename)
             else:
                 print(" Failed!:\n", cmd_output)
         except Exception as e:
             print(e)
-        table_all = table_all + table
+        mac_table_all = mac_table_all + table
     filename = os.path.join(homedir, "all_mac_" + time.strftime("%Y%m%d-%H%M%S") + ".csv")
-    table_all = sorted(table_all, key=None, reverse=False)
-    write_csv(re_table.header, table_all, filename)
+    mac_table_all = sorted(mac_table_all, key=None, reverse=False)
+    write_csv(table_header, mac_table_all, filename)
 
 
 def ssh_show_run(device_type):
